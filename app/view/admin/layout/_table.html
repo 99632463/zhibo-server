@@ -1,0 +1,85 @@
+<div class="card card-table">
+
+  {% if table.buttons %}
+  <div class="card-header">
+    {% if table.buttons.add %}
+    <a href="{{table.buttons.add}}" class="btn btn-outline-primary">创建</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div class="card-body">
+    {% if table.tabs %}
+    <ul class="nav nav-tabs nav-tabs-top">
+        {% for item in table.tabs %}
+        <li class="nav-item">
+            <a href="{{item.url}}" class="nav-link {% if item.active %} active {% endif %}">{{item.name}}</a>
+        </li> 
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <div class="table-responsive">
+      {% if table %}
+      <table class="table table-hover table-center mb-0">
+        <thead>
+          <tr>
+            {% for item in table.columns %}
+            <th>{{item.title}}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in data %}
+          <tr>
+            {% for item2 in table.columns %}
+              <td align="{{item2.align}}" width="{{item2.width}}">
+                {% if item2.key %}
+                  {{item[item2.key]}}
+                {% elif item2.render %}
+                  {{item2.render(item) | safe}}
+                {% else %}
+                  <div class="actions">
+                    {% if item2.action.edit %}
+                      <a href="{{item2.action.edit(item.id)}}" class="btn btn-sm bg-success-light mr-2">
+                        <i class="fe fe-pencil"></i> 修改
+                      </a>
+                    {% endif %}
+                    {% if item2.action.delete %}
+                      <a href="javascript:;" @click="del('{{ item2.action.delete(item.id) }}')" class="btn btn-sm bg-danger-light">
+                        <i class="fe fe-trash"></i> 删除
+                      </a>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card-footer d-flex justify-content-center">
+    {{ctx.locals.pageRender | safe}}
+  </div>
+</div>
+
+<script>
+  var Vueapp = new Vue({
+    el:"#vueapp",
+    methods: {
+      del(url){
+        this.$refs.confirm.show({
+          title:"提示",
+          content:"是否要删除该记录？",
+          success:function(){
+            window.location.href = url
+          }
+        })
+      },
+    }
+  })
+</script>
